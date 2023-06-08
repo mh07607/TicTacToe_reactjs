@@ -32,7 +32,7 @@ export function Board({squares, XisNext, onPlay}){
         newSquares[i] = 'O';
       }
       
-      onPlay(newSquares);
+      onPlay(newSquares, i);
     }
 
     function isWinningSquare(index) {
