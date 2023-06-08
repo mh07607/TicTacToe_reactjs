@@ -1,23 +1,36 @@
+import { useState, useEffect } from 'react';
 import { Square } from './Square.js'
 
 
-export function Board({squares, XisNext, onPlay}){
-
+export function Board({squares, XisNext, onPlay, winPath}){
+    
     const gameWinner = gameOver(squares);
     let status = '';
-    if(gameWinner)
+    if(gameWinner[0])
     {
-      status = 'Winner: ' + gameWinner;
+      status = 'Winner: ' + gameWinner[0];
     }
     else{
       status = 'Next turn:' + (XisNext? 'X': 'O');
     }
   
     function handleClick(i){
-      if(squares[i] || gameOver(squares)){
+      // let endGame = gameOver(squares);
+      // if(endGame[0]){
+      //   let newWinPath = winPath;
+      //   let [a, b, c] = endGame[1];
+      //   newWinPath[a] = true;
+      //   newWinPath[b] = true;
+      //   newWinPath[c] = true;
+      //   setWinPath(newWinPath);
+      //   return;
+      // } 
+
+
+      if(squares[i] || gameOver(squares)[0]){
         return;
       }
-  
+
       let newSquares = squares.slice();
   
       if(XisNext){
@@ -28,28 +41,39 @@ export function Board({squares, XisNext, onPlay}){
   
       onPlay(newSquares);
     }
+
+    useEffect(() => {
+      const gameWinner = gameOver(squares);
+      if (gameWinner[0]) {
+        const newWinPath = Array(9).fill(false);
+        const [a, b, c] = gameWinner[1];
+        newWinPath[a] = true;
+        newWinPath[b] = true;
+        newWinPath[c] = true;
+      }
+    }, [squares]);
+    
+
+    const boardRows = [];
+    for (let row = 0; row < 3; row++) {
+      const rowSquares = [];
+      for (let col = 0; col < 3; col++) {
+        const index = row * 3 + col;
+        rowSquares.push(
+          <Square key={index} value={squares[index]} onBtnClick={() => handleClick(index)} highlight = {winPath[index]}/>
+        );
+      }
+      boardRows.push(<div className='boardRow' key={row}>{rowSquares}</div>);
+    }
   
     return (
       <>
         <div className='status'>{status}</div>
-        <div className='boardRow'>
-        <Square value = {squares[0]} onBtnClick = {() => handleClick(0)}/>
-        <Square value = {squares[1]} onBtnClick = {() => handleClick(1)}/>
-        <Square value = {squares[2]} onBtnClick = {() => handleClick(2)}/>
-        </div>
-        <div className='boardRow'>
-        <Square value = {squares[3]} onBtnClick = {() => handleClick(3)}/>
-        <Square value = {squares[4]} onBtnClick = {() => handleClick(4)}/>
-        <Square value = {squares[5]} onBtnClick = {() => handleClick(5)}/>
-        </div>
-        <div className='boardRow'>
-        <Square value = {squares[6]} onBtnClick = {() => handleClick(6)}/>
-        <Square value = {squares[7]} onBtnClick = {() => handleClick(7)}/>
-        <Square value = {squares[8]} onBtnClick = {() => handleClick(8)}/>
-        </div>
+        {boardRows}
       </>
     );
   }
+    
 
   function gameOver(squares){
     let winConditions = [
@@ -66,8 +90,8 @@ export function Board({squares, XisNext, onPlay}){
     for(let i = 0; i < winConditions.length; i++){
       const [a, b, c] = winConditions[i];
       if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c]){
-        return squares[a];
+        return [squares[a], winConditions[i]];
       }
     }
-    return false;
+    return [false];
   }
