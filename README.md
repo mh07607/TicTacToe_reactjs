@@ -1,2 +1,2 @@
 # TicTacToe_reactjs
-A rudimentary tictactoe project for learning react.
+A rudimentary tictactoe project (with time travel) for learning react.
