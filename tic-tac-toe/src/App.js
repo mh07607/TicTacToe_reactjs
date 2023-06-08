@@ -2,13 +2,11 @@ import { Component, useState } from 'react'
 import { Board } from './components/Board.js'
 
 export default function Game(){
-  const [winPaths, setWinPaths] = useState([Array(9).fill(false)]);
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const [listReverse, setListReverse] = useState(false);
 
   const currentGrid = history[currentMove];
-  const currentWinPath = winPaths[currentMove];
   const XisNext = currentMove%2==0;
   
 
@@ -27,7 +25,6 @@ export default function Game(){
   function onPlay(nextSquares){
     const nextHistory = [...history.slice(0, currentMove+1), nextSquares];
     setHistory(nextHistory);
-    setWinPaths();
     setCurrentMove(nextHistory.length-1);
   }
 

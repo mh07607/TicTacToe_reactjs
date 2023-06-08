@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Square } from './Square.js'
 
 
-export function Board({squares, XisNext, onPlay, winPath}){
+export function Board({squares, XisNext, onPlay}){
     
     const gameWinner = gameOver(squares);
     let status = '';
@@ -11,21 +11,14 @@ export function Board({squares, XisNext, onPlay, winPath}){
       status = 'Winner: ' + gameWinner[0];
     }
     else{
-      status = 'Next turn:' + (XisNext? 'X': 'O');
+      if(squares.includes(null)){
+        status = 'Next turn:' + (XisNext? 'X': 'O');      
+      } else {
+        status = "It's a draw!";
+      }
     }
   
     function handleClick(i){
-      // let endGame = gameOver(squares);
-      // if(endGame[0]){
-      //   let newWinPath = winPath;
-      //   let [a, b, c] = endGame[1];
-      //   newWinPath[a] = true;
-      //   newWinPath[b] = true;
-      //   newWinPath[c] = true;
-      //   setWinPath(newWinPath);
-      //   return;
-      // } 
-
 
       if(squares[i] || gameOver(squares)[0]){
         return;
@@ -38,21 +31,17 @@ export function Board({squares, XisNext, onPlay, winPath}){
       } else {
         newSquares[i] = 'O';
       }
-  
+      
       onPlay(newSquares);
     }
 
-    useEffect(() => {
-      const gameWinner = gameOver(squares);
-      if (gameWinner[0]) {
-        const newWinPath = Array(9).fill(false);
-        const [a, b, c] = gameWinner[1];
-        newWinPath[a] = true;
-        newWinPath[b] = true;
-        newWinPath[c] = true;
+    function isWinningSquare(index) {
+      const [winner, winningCombination] = gameWinner;
+      if (!winner) {
+        return false;
       }
-    }, [squares]);
-    
+      return winningCombination.includes(index);
+    }
 
     const boardRows = [];
     for (let row = 0; row < 3; row++) {
@@ -60,7 +49,7 @@ export function Board({squares, XisNext, onPlay, winPath}){
       for (let col = 0; col < 3; col++) {
         const index = row * 3 + col;
         rowSquares.push(
-          <Square key={index} value={squares[index]} onBtnClick={() => handleClick(index)} highlight = {winPath[index]}/>
+          <Square key={index} value={squares[index]} onBtnClick={() => handleClick(index)} highlight = {isWinningSquare(index)}/>
         );
       }
       boardRows.push(<div className='boardRow' key={row}>{rowSquares}</div>);
